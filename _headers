@@ -1,0 +1,13 @@
+# CDN-level Netlify headers — always honored, including direct-upload
+# deploys (`netlify deploy --dir universal-links`), where netlify.toml is
+# uploaded as a static file and NOT processed as config.
+#
+# Mirrors universal-links/netlify.toml's [[headers]] block.
+/.well-known/*
+  Content-Type: application/json
+
+# HTML pages (landing page, booking.html, and rewritten /book/* routes)
+# must always revalidate — prevents a stale Netlify 404 or an old landing
+# page from being served after a new deploy.
+/*
+  Cache-Control: public, max-age=0, must-revalidate

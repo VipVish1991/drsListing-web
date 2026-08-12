@@ -1,0 +1,38 @@
+# Netlify deploy config for the DrsListing booking page + App Links host.
+# Publish directory: universal-links/
+
+# Ensure the platform verification files are served with the correct type.
+[[headers]]
+  for = "/.well-known/*"
+  [headers.values]
+    Content-Type = "application/json"
+
+# HTML pages (landing page, booking.html, and rewritten /book/* routes)
+# must always revalidate — prevents a stale Netlify 404 or an old landing
+# page from being served after a new deploy. Mirrors universal-links/_headers.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# HTTPS booking links → static booking page (booking.html).
+#
+# Served with status 200 (rewrite), so the browser URL stays
+# /book/<placeId>?token=... and booking.html can read the placeId from the
+# path and the shared-secret token from the query string. We deliberately
+# do NOT redirect to the Supabase Edge Function here: its shared
+# *.supabase.co domain rewrites text/html GET responses to text/plain,
+# which made browsers show the raw HTML instead of rendering the page.
+[[redirects]]
+  from = "/book/*"
+  to = "/booking.html"
+  status = 200
+  force = true
+
+# Slot-management links have no web page — send non-app users somewhere
+# useful (e.g. your app store listing).
+[[redirects]]
+  from = "/manage-slots/*"
+  to = "https://play.google.com/store/apps/details?id=com.drslisting.ai"
+  status = 302
+  force = true

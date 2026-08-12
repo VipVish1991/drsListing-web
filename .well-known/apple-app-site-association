@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAM_ID_PLACEHOLDER.com.drslisting.ai",
+        "paths": ["/book/*", "/manage-slots/*"]
+      }
+    ]
+  }
+}

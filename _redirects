@@ -1,0 +1,15 @@
+# CDN-level Netlify redirects — always honored, including direct-upload
+# deploys (`netlify deploy --dir universal-links`), where netlify.toml is
+# uploaded as a static file and NOT processed as config.
+#
+# Mirrors universal-links/netlify.toml. If both exist, netlify.toml takes
+# precedence when a Netlify Build runs (Git/dashboard deploys); this file
+# covers direct-upload deploys.
+
+# HTTPS booking links → static booking page (booking.html), served with
+# status 200 (rewrite) so the browser URL stays /book/<placeId>?token=...
+# and booking.html can read the placeId from the path.
+/book/*  /booking.html  200
+
+# Slot-management links have no web page — send non-app users to the app.
+/manage-slots/*  https://play.google.com/store/apps/details?id=com.drslisting.ai  302

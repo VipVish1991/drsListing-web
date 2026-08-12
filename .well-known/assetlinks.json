@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.drslisting.ai",
+      "sha256_cert_fingerprints": [
+        "AB:C4:19:C3:04:CC:03:9B:42:73:EB:CD:52:B1:1C:EE:66:C2:10:CB:AC:F9:D1:F3:2E:12:B5:88:2D:02:AA:E5"
+      ]
+    }
+  }
+]

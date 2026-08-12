@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DrsListing — Book an Appointment</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #F7F2E8;
+      --card: #FFFFFF;
+      --primary: #0E7C66;
+      --primary-2: #12A48B;
+      --text: #1F2933;
+      --body: #6B7280;
+      --caption: #9CA3AF;
+    }
+    .hidden { display: none !important; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Top bar with Download App (same design as booking.html) */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
+      padding: 14px 20px;
+      background: rgba(247, 242, 232, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand .logo {
+      width: 38px; height: 38px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(14,124,102,0.3);
+    }
+    .brand .name { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+    .brand .name span { color: var(--primary); }
+    .dl-wrap { position: relative; }
+    .dl-btn {
+      display: flex; align-items: center; gap: 7px;
+      padding: 10px 16px;
+      border: none; border-radius: 999px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff; font-size: 13.5px; font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(14,124,102,0.35);
+      transition: transform 0.15s, opacity 0.2s;
+    }
+    .dl-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+    .dl-menu {
+      position: absolute; right: 0; top: calc(100% + 8px);
+      min-width: 230px;
+      background: var(--card); border-radius: 18px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.16);
+      padding: 8px;
+      display: none;
+      flex-direction: column; gap: 4px;
+      z-index: 60;
+    }
+    .dl-menu.open { display: flex; }
+    .dl-menu a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px; border-radius: 12px;
+      text-decoration: none; color: var(--text);
+      transition: background 0.15s;
+    }
+    .dl-menu a:hover { background: var(--bg); }
+    .store-ic {
+      width: 32px; height: 32px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: #fff; flex-shrink: 0;
+    }
+    .store-ic.android { background: #3DDC84; }
+    .store-ic.ios { background: #111; }
+    .store-name { font-size: 13.5px; font-weight: 700; }
+    .store-sub { font-size: 11px; color: var(--caption); }
+    /* Session bar (below the header) — same design as booking.html */
+    .session-bar {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; max-width: 440px;
+      margin: 16px auto 0;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(14,124,102,0.10), rgba(18,164,139,0.04));
+      border: 1px solid rgba(14,124,102,0.24);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .session-bar .s-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 16px; font-weight: 800; flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(14,124,102,0.3);
+    }
+    .session-bar .s-info { flex: 1; min-width: 0; }
+    .session-bar .s-name {
+      font-size: 15px; font-weight: 800; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .session-bar .s-mobile {
+      display: inline-block; font-size: 12.5px; color: var(--body); font-weight: 500;
+      margin-top: 1px; text-decoration: none;
+      border-bottom: 1px dashed rgba(14,124,102,0.35);
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .session-bar .s-mobile:hover { color: var(--primary); border-bottom-style: solid; }
+    .logout-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 15px;
+      border: 1.5px solid #FCA5A5;
+      border-radius: 999px;
+      background: #FEF2F2;
+      color: #B91C1C;
+      font-size: 12.5px; font-weight: 700; font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .logout-btn:hover { background: #FEE2E2; transform: translateY(-1px); }
+    .toast {
+      position: fixed; left: 50%; bottom: 26px;
+      transform: translateX(-50%) translateY(90px);
+      max-width: 90vw;
+      background: #1F2933; color: #fff;
+      padding: 12px 18px; border-radius: 13px;
+      font-size: 13.5px; font-weight: 600;
+      box-shadow: 0 12px 34px rgba(0,0,0,0.28);
+      opacity: 0; pointer-events: none;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      z-index: 120;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    @media (max-width: 480px) {
+      .brand .name { display: none; }
+      .logout-btn { padding: 8px 12px; }
+    }
+
+    /* Hero */
+    .hero {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 24px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      padding: 40px 28px;
+      width: 100%;
+      max-width: 440px;
+      text-align: center;
+    }
+    .logo-big {
+      width: 64px; height: 64px;
+      margin: 0 auto 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 6px 16px rgba(14,124,102,0.28);
+    }
+    h1 { font-size: 24px; color: var(--text); margin-bottom: 8px; }
+    .tagline { font-size: 14.5px; color: var(--body); line-height: 1.6; margin-bottom: 26px; }
+    .btn {
+      display: inline-block;
+      padding: 14px 26px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+      border-radius: 14px;
+      font-size: 15.5px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 6px 16px rgba(14,124,102,0.3);
+    }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .foot { margin-top: 26px; font-size: 11.5px; color: var(--caption); }
+    .badge {
+      display: inline-block;
+      margin-bottom: 22px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: #ECFDF5;
+      color: #065F46;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <!-- ── Top bar: brand + Download App ─────────────────────────── -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">🩺</div>
+      <div class="name">Drs<span>Listing</span></div>
+    </div>
+    <div class="dl-wrap">
+      <button type="button" class="dl-btn" id="dlBtn">📲 Download App</button>
+      <div class="dl-menu" id="dlMenu">
+        <a id="androidLink" href="https://play.google.com/store/apps/details?id=com.drslisting.ai" target="_blank" rel="noopener">
+          <span class="store-ic android">▶</span>
+          <span><span class="store-name">Google Play</span><br><span class="store-sub">Get it on Android</span></span>
+        </a>
+        <!-- iOS is not on the App Store yet — point at the landing page until
+             it goes live, then swap in https://apps.apple.com/app/id<...> -->
+        <a id="iosLink" href="https://drslisting-booking.netlify.app" target="_blank" rel="noopener">
+          <span class="store-ic ios"></span>
+          <span><span class="store-name">App Store</span><br><span class="store-sub">Download on iOS</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Session bar: patient name + mobile + Logout (below the header) -->
+  <section class="session-bar hidden" id="sessionBar" aria-label="Signed in as">
+    <div class="s-avatar" id="sessionAvatar">👤</div>      <div class="s-info">
+        <div class="s-name" id="sessionName">Patient</div>
+        <a class="s-mobile" id="sessionMobile" href="#" aria-label="Call this number">Mobile</a>
+      </div>
+    <button type="button" class="logout-btn" id="logoutBtn" title="Log out from this device">
+      Logout
+    </button>
+  </section>
+
+  <main class="hero">
+    <div class="card">
+      <div class="logo-big">🩺</div>
+      <h1>DrsListing</h1>
+      <div class="badge">Appointment Booking</div>
+      <p class="tagline">
+        Book an appointment with your doctor in seconds.
+        Open the booking page from the QR code shown in the
+        doctor profile to get started.
+      </p>
+      <a class='btn' href='/booking' id='bookingBtn'>Open Booking Page</a>
+      <div class="foot">DrsListing · Your AI Health Assistant</div>
+    </div>
+  </main>
+
+  <!-- Toast for transient feedback (logout) -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const LS_MOBILE = 'drslisting_mobile';
+  const LS_NAME = 'drslisting_name';
+
+  // Download App dropdown
+  $('dlBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    $('dlMenu').classList.toggle('open');
+  });
+  document.addEventListener('click', () =>
+    $('dlMenu').classList.remove('open'));
+
+  // If the visitor landed on the root WITH valid booking params
+  // (?token=…&name=…&doctor=…), carry them over to the booking page so
+  // the form opens pre-authorized instead of showing the invalid-link
+  // message. A bare root visit (no params) just goes to booking.html.
+  if (window.location.search) {
+    $('bookingBtn').href = '/booking' + window.location.search;
+  }
+
+  // ── Session bar: patient name + mobile + Logout ──────────────────
+  // Shared with booking.html via localStorage, so a returning patient
+  // sees their identity here too. Logout clears it on this device.
+  let patient = {
+    name: localStorage.getItem(LS_NAME) || '',
+    mobile: localStorage.getItem(LS_MOBILE) || '',
+  };
+
+  function fmtMobile(m) {
+    const digits = String(m || '').replace(/\D/g, '');
+    if (digits.length === 10) return '+91 ' + digits.slice(0, 5) + ' ' + digits.slice(5);
+    if (digits.length === 12 && digits.startsWith('91')) {
+      return '+91 ' + digits.slice(2, 7) + ' ' + digits.slice(7);
+    }
+    return digits || '';
+  }
+
+  function initials(name) {
+    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return parts.length ? parts[0][0].toUpperCase() : '👤';
+  }
+
+  function updateSessionBar() {
+    const hasSession = !!(patient.name && patient.mobile);
+    $('sessionBar').classList.toggle('hidden', !hasSession);
+    if (hasSession) {
+      $('sessionName').textContent = patient.name;
+      const digits = String(patient.mobile || '').replace(/\D/g, '');
+      $('sessionMobile').textContent = fmtMobile(digits);
+      // Tap-to-call: the session-bar number becomes a tel: link.
+      $('sessionMobile').href = digits ? 'tel:' + digits : '#';
+      $('sessionMobile').setAttribute('aria-label', 'Call ' + fmtMobile(digits));
+      $('sessionAvatar').textContent = initials(patient.name);
+    }
+  }
+
+  let toastTimer = null;
+  function toast(msg) {
+    const t = $('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  $('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem(LS_NAME);
+    localStorage.removeItem(LS_MOBILE);
+    patient = { name: '', mobile: '' };
+    updateSessionBar();
+    toast('Logged out — your details were cleared');
+  });
+
+  updateSessionBar();
+</script>
+</body>
+</html>

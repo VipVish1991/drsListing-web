@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book an Appointment</title>
+  <style>
+    :root {
+      --bg: #F7F2E8;
+      --card: #FFFFFF;
+      --primary: #0E7C66;
+      --primary-2: #12A48B;
+      --text: #1F2933;
+      --body: #6B7280;
+      --caption: #9CA3AF;
+      --border: #E5E7EB;
+      --surface: #FAFAF9;
+      --tele: #1E3A8A;
+      --video: #6B21A8;
+      --clinic: #92400E;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      color: var(--text);
+    }
+
+    /* ── Top bar with Download App ─────────────────────────────── */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
+      padding: 14px 20px;
+      background: rgba(247, 242, 232, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand .logo {
+      width: 38px; height: 38px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(14,124,102,0.3);
+    }
+    .brand .name { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+    .brand .name span { color: var(--primary); }
+    .dl-wrap { position: relative; }
+    .dl-btn {
+      display: flex; align-items: center; gap: 7px;
+      padding: 10px 16px;
+      border: none; border-radius: 999px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff; font-size: 13.5px; font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(14,124,102,0.35);
+      transition: transform 0.15s, opacity 0.2s;
+    }
+    .dl-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+    .dl-btn:active { transform: translateY(0); }
+    .dl-menu {
+      position: absolute; right: 0; top: calc(100% + 8px);
+      min-width: 230px;
+      background: var(--card); border-radius: 18px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.16);
+      padding: 8px;
+      display: none;
+      flex-direction: column; gap: 4px;
+      z-index: 60;
+    }
+    .dl-menu.open { display: flex; }
+    .dl-menu a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px; border-radius: 12px;
+      text-decoration: none; color: var(--text);
+      transition: background 0.15s;
+    }
+    .dl-menu a:hover { background: var(--bg); }
+    .store-ic {
+      width: 32px; height: 32px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: #fff; flex-shrink: 0;
+    }
+    .store-ic.android { background: #3DDC84; }
+    .store-ic.ios { background: #111; }
+    .store-name { font-size: 13.5px; font-weight: 700; }
+    .store-sub { font-size: 11px; color: var(--caption); }
+
+    /* ── Session bar (below the header, above the doctor card) ───── */
+    .session-bar {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 16px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(14,124,102,0.10), rgba(18,164,139,0.04));
+      border: 1px solid rgba(14,124,102,0.24);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .session-bar .s-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 16px; font-weight: 800; flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(14,124,102,0.3);
+    }
+    .session-bar .s-info { flex: 1; min-width: 0; }
+    .session-bar .s-name {
+      font-size: 15px; font-weight: 800; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .session-bar .s-mobile {
+      display: inline-block; font-size: 12.5px; color: var(--body); font-weight: 500;
+      margin-top: 1px; text-decoration: none;
+      border-bottom: 1px dashed rgba(14,124,102,0.35);
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .session-bar .s-mobile:hover { color: var(--primary); border-bottom-style: solid; }
+    .logout-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 15px;
+      border: 1.5px solid #FCA5A5;
+      border-radius: 999px;
+      background: #FEF2F2;
+      color: #B91C1C;
+      font-size: 12.5px; font-weight: 700; font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .logout-btn:hover { background: #FEE2E2; transform: translateY(-1px); }
+    .logout-btn:active { transform: translateY(0); }
+
+    /* Toast */
+    .toast {
+      position: fixed; left: 50%; bottom: 26px;
+      transform: translateX(-50%) translateY(90px);
+      max-width: 90vw;
+      background: #1F2933; color: #fff;
+      padding: 12px 18px; border-radius: 13px;
+      font-size: 13.5px; font-weight: 600;
+      box-shadow: 0 12px 34px rgba(0,0,0,0.28);
+      opacity: 0; pointer-events: none;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      z-index: 120;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* ── Layout ────────────────────────────────────────────────── */
+    .container { max-width: 620px; margin: 0 auto; padding: 20px 16px 48px; }
+    .card {
+      background: var(--card);
+      border-radius: 22px;
+      box-shadow: 0 6px 24px rgba(31,41,51,0.07);
+      padding: 22px;
+      margin-bottom: 16px;
+    }
+    .hidden { display: none !important; }
+    h2 { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
+    .sub { font-size: 13px; color: var(--body); margin-bottom: 14px; }
+
+    /* Doctor card */
+    .doctor-card { display: flex; align-items: flex-start; gap: 14px; }
+    .avatar {
+      width: 56px; height: 56px; border-radius: 18px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; flex-shrink: 0;
+      box-shadow: 0 6px 16px rgba(14,124,102,0.3);
+    }
+    .doctor-card h1 { font-size: 19px; font-weight: 800; line-height: 1.25; }
+    .doctor-card .meta { font-size: 13px; color: var(--primary); font-weight: 600; margin-top: 2px; }
+    /* Call / Directions quick links under the doctor name (same data as
+       the history accordion rows, shown right on the booking card). */
+    .doctor-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .doctor-links a.dlink {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: rgba(14,124,102,0.08);
+      border: 1.5px solid rgba(14,124,102,0.25);
+      color: var(--primary); font-size: 12.5px; font-weight: 700;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+    }
+    .doctor-links a.dlink:hover {
+      background: rgba(14,124,102,0.14);
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+    .doctor-links a.dlink:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+    /* Form */
+    label { font-size: 12.5px; font-weight: 700; color: var(--text); display: block; margin: 14px 0 6px; }
+    input, textarea {
+      width: 100%;
+      padding: 13px 15px;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      font-size: 15px;
+      font-family: inherit;
+      background: var(--surface);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    input:focus, textarea:focus {
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(14,124,102,0.1);
+    }
+    textarea { resize: vertical; min-height: 84px; }
+
+    .btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+      border: none;
+      border-radius: 15px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(14,124,102,0.35);
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn:hover:not(:disabled) { opacity: 0.92; transform: translateY(-1px); }
+    .btn:active:not(:disabled) { transform: translateY(0); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+
+    /* Date strip (14 days, like the app) */
+    .date-strip {
+      display: flex; gap: 8px; overflow-x: auto;
+      padding: 6px 2px 12px;
+      scrollbar-width: none;
+    }
+    .date-strip::-webkit-scrollbar { display: none; }
+    .date-chip {
+      flex: 0 0 auto;
+      width: 62px;
+      padding: 10px 4px 8px;
+      border-radius: 16px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      transition: all 0.18s;
+    }
+    .date-chip .d-day { font-size: 11px; font-weight: 700; color: var(--caption); }
+    .date-chip .d-num { font-size: 19px; font-weight: 800; color: var(--text); line-height: 1.1; }
+    .date-chip .d-month { font-size: 9.5px; font-weight: 600; color: var(--caption); }
+    .date-chip .d-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); margin-top: 3px; }
+    .date-chip:hover { border-color: var(--primary); }
+    .date-chip.selected {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border-color: transparent;
+      box-shadow: 0 6px 16px rgba(14,124,102,0.35);
+    }
+    .date-chip.selected .d-day,
+    .date-chip.selected .d-month,
+    .date-chip.selected .d-num { color: #fff; }
+    .date-chip.selected .d-dot { background: #fff; }
+    .date-chip.empty { opacity: 0.45; cursor: default; }
+    .date-chip.empty:hover { border-color: var(--border); }
+    .date-chip.unavailable {
+      background: rgba(220, 38, 38, 0.08);
+      border-color: rgba(220, 38, 38, 0.35);
+      opacity: 0.85;
+      cursor: default;
+    }
+    .date-chip.unavailable .d-day,
+    .date-chip.unavailable .d-num,
+    .date-chip.unavailable .d-month { color: #B91C1C; }
+    .date-chip.unavailable .d-x {
+      display: inline-block;
+      margin-top: 3px;
+      width: 16px;
+      height: 16px;
+      line-height: 15px;
+      border-radius: 50%;
+      background: rgba(220, 38, 38, 0.18);
+      color: #B91C1C;
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .date-chip.unavailable:hover { border-color: rgba(220, 38, 38, 0.35); }
+
+    /* Slot groups */
+    .slot-group { margin-bottom: 16px; }
+    .slot-type {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .slot-type .t-label { font-size: 13px; font-weight: 700; }
+    .slot-type .t-fee {
+      font-size: 11px; font-weight: 700;
+      padding: 3px 9px; border-radius: 999px;
+      background: rgba(14,124,102,0.1); color: var(--primary);
+    }
+    .slot-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .slot-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 13px;
+      border-radius: 13px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      font-size: 13px; font-weight: 700; color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .slot-chip:hover:not(.disabled):not(.selected) { border-color: var(--primary); }
+    .slot-chip.selected {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border-color: transparent; color: #fff;
+      box-shadow: 0 4px 12px rgba(14,124,102,0.3);
+    }
+    .slot-chip.disabled {
+      background: var(--surface);
+      color: var(--caption);
+      border-color: var(--border);
+      cursor: not-allowed;
+      text-decoration: line-through;
+    }
+    .slot-chip.past { text-decoration: line-through; }
+    .empty-note {
+      padding: 16px;
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--caption);
+      font-size: 13.5px;
+      text-align: center;
+    }
+
+    /* Status / success */
+    .status {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 13px;
+      font-size: 13.5px;
+      line-height: 1.5;
+      display: none;
+    }
+    .status.ok { display: block; background: #ECFDF5; color: #065F46; }
+    .status.err { display: block; background: #FEF2F2; color: #991B1B; }
+    .success-hero { text-align: center; padding: 12px 0 4px; }
+    .success-hero .big {
+      width: 64px; height: 64px; margin: 0 auto 12px;
+      border-radius: 50%;
+      background: rgba(18,164,139,0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+    }
+    .success-hero h2 { font-size: 20px; margin-bottom: 6px; }
+    .success-hero p { font-size: 13.5px; color: var(--body); line-height: 1.5; }
+    /* Consultation fee chip shown on the success card when the booked
+       slot carries a fee (pay-at-clinic — the web flow has no UPI
+       intent, so the amount is informational + the status label). */
+    .success-hero .pay-chip {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 7px 16px;
+      border-radius: 999px;
+      background: rgba(14, 124, 102, 0.1);
+      border: 1px solid rgba(14, 124, 102, 0.3);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    /* History — collapsible accordion items */
+    .history-item {
+      border-radius: 16px;
+      background: var(--surface);
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .acc-head {
+      width: 100%; display: flex; align-items: center; gap: 12px;
+      padding: 13px 14px;
+      background: none; border: none; cursor: pointer;
+      font-family: inherit; color: var(--text); text-align: left;
+      transition: background 0.15s;
+    }
+    .acc-head:hover { background: rgba(14,124,102,0.05); }
+    .acc-head:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+    .acc-head .h-ic {
+      width: 42px; height: 42px; border-radius: 13px;
+      background: var(--card);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 19px; flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .acc-head .h-main { flex: 1; min-width: 0; }
+    .acc-head .h-doctor { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .acc-head .h-meta { font-size: 12px; color: var(--body); margin-top: 2px; }
+    .acc-head .chev {
+      font-size: 13px; color: var(--caption); flex-shrink: 0;
+      transition: transform 0.25s ease;
+    }
+    .acc-head.open .chev { transform: rotate(180deg); }
+    .acc-body {
+      max-height: 0; overflow: hidden; visibility: hidden;
+      transition: max-height 0.32s ease, visibility 0s linear 0.32s;
+    }
+    .acc-body.open {
+      max-height: 1000px; visibility: visible;
+      transition: max-height 0.32s ease;
+    }
+    .acc-inner {
+      margin: 0 14px;
+      padding: 6px 0 14px;
+      border-top: 1px dashed var(--border);
+    }
+    .detail-row {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 7px 0; font-size: 13px;
+    }
+    .detail-row .d-ic { width: 18px; text-align: center; font-size: 14px; flex-shrink: 0; }
+    .detail-row .d-label {
+      min-width: 96px; padding-top: 1px;
+      font-size: 11px; font-weight: 700; color: var(--caption);
+      text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .detail-row .d-value { font-weight: 600; color: var(--text); word-break: break-word; }
+    .detail-row .d-value a.dlink {
+      display: inline-flex; align-items: center; gap: 5px;
+      color: var(--primary); font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1.5px dashed rgba(14,124,102,0.4);
+      padding-bottom: 1px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .detail-row .d-value a.dlink:hover { color: var(--primary-2); border-bottom-style: solid; }
+    .detail-row .d-value a.dlink:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
+    .dir-link { display: inline-flex; align-items: center; gap: 6px; }
+    /* Prescription photo thumbnails inside the accordion details */
+    .rx-thumbs { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 2px; }
+    .rx-thumb {
+      width: 62px; height: 62px; border-radius: 10px; overflow: hidden;
+      border: 1px solid var(--border); background: var(--card);
+      display: block; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      transition: transform 0.15s;
+    }
+    .rx-thumb:hover { transform: translateY(-1px); }
+    .rx-thumb:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .rx-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* Failed prescription image — visible locked/error state instead of
+       silently hiding the thumbnail (keeps the link live to retry). */
+    .rx-thumb.failed {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px;
+      background: var(--surface);
+      border: 1.5px dashed var(--border);
+      color: var(--caption);
+      text-decoration: none;
+    }
+    .rx-thumb.failed .rx-fail-ic { font-size: 18px; line-height: 1.2; }
+    .rx-thumb.failed .rx-fail-tx {
+      font-size: 8px; font-weight: 800; letter-spacing: 0.5px;
+      text-transform: uppercase; color: var(--caption);
+    }
+    .rx-thumb.failed:hover {
+      transform: translateY(-1px);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .rx-thumb.failed:hover .rx-fail-tx { color: var(--primary); }
+    .badge {
+      font-size: 10.5px; font-weight: 800;
+      padding: 4px 10px; border-radius: 999px;
+      text-transform: uppercase; letter-spacing: 0.3px; flex-shrink: 0;
+    }
+    .badge.pending { background: #FFFBEB; color: #92400E; }
+    .badge.upcoming { background: #ECFDF5; color: #065F46; }
+    .badge.completed { background: #EFF6FF; color: #1E40AF; }
+    .badge.cancelled { background: #FEF2F2; color: #991B1B; }
+    .history-empty { color: var(--caption); font-size: 13.5px; text-align: center; padding: 8px 0; }
+
+    .foot {
+      margin-top: 22px;
+      font-size: 11.5px; color: var(--caption);
+      text-align: center;
+    }
+    @media (max-width: 480px) {
+      .brand .name { display: none; }
+      .logout-btn { padding: 8px 12px; }
+    }
+    @media (max-width: 400px) {
+      .container { padding: 14px 10px 40px; }
+      .card { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- ── Top bar: brand + Download App ─────────────────────────── -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">🩺</div>
+      <div class="name">Drs<span>Listing</span></div>
+    </div>
+    <div class="dl-wrap">
+      <button type="button" class="dl-btn" id="dlBtn">📲 Download App</button>
+      <div class="dl-menu" id="dlMenu">
+        <a id="androidLink" href="https://play.google.com/store/apps/details?id=com.drslisting.ai" target="_blank" rel="noopener">
+          <span class="store-ic android">▶</span>
+          <span><span class="store-name">Google Play</span><br><span class="store-sub">Get it on Android</span></span>
+        </a>
+        <a id="iosLink" href="https://drslisting-booking.netlify.app" target="_blank" rel="noopener">
+          <span class="store-ic ios"></span>
+          <span><span class="store-name">App Store</span><br><span class="store-sub">Download on iOS</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- ── Session bar: patient name + mobile + Logout (above the
+         "Book With" doctor card) — shown once their details are known ── -->
+    <section class="session-bar hidden" id="sessionBar" aria-label="Signed in as">
+      <div class="s-avatar" id="sessionAvatar">👤</div>
+      <div class="s-info">
+        <div class="s-name" id="sessionName">Patient</div>
+        <a class="s-mobile" id="sessionMobile" href="#" aria-label="Call this number">Mobile</a>
+      </div>
+      <button type="button" class="logout-btn" id="logoutBtn" title="Log out from this device">
+        Logout
+      </button>
+    </section>
+
+    <!-- ── Doctor card ──────────────────────────────────────────── -->
+    <section class="card doctor-card" id="doctorCard">
+      <div class="avatar">🩺</div>
+      <div style="min-width:0">
+        <h1 id="pageTitle">Book an Appointment</h1>
+        <p class="meta" id="doctorMeta">Doctor's Clinic</p>
+        <div class="doctor-links" id="doctorLinks"></div>
+      </div>
+    </section>
+
+    <!-- ── Invalid link (fail closed) ───────────────────────────── -->
+    <section class="card hidden" id="invalidCard">
+      <p style="font-size:14px;color:var(--body);line-height:1.6">
+        This booking link is no longer valid. Please rescan the QR code from the doctor profile.
+      </p>
+    </section>
+
+    <!-- ── Step 1: patient details (saved to users table first) ── -->
+    <section class="card" id="step1">
+      <h2>Your Details</h2>
+      <p class="sub">Enter your name and mobile number — we'll remember you for next time.</p>
+      <form id="bookingForm">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" placeholder="e.g. Rahul Sharma" autocomplete="name" required>
+
+        <label for="mobile">Mobile Number</label>
+        <input type="tel" id="mobile" placeholder="e.g. 9876543210" inputmode="tel" autocomplete="tel" required>
+
+        <button type="button" class="btn" id="saveBtn">Save &amp; Continue</button>
+      </form>
+      <div class="status" id="step1Status"></div>
+    </section>
+
+    <!-- ── Step 2: pick date + slot (like the app booking screen) ── -->
+    <section class="card hidden" id="step2">
+      <h2>Select Date</h2>
+      <div class="date-strip" id="dateStrip"></div>
+
+      <h2 style="margin-top:6px">Available Slots</h2>
+      <div id="slotArea"><div class="empty-note">Loading availability…</div></div>
+
+      <label for="description">Describe your problem (optional)</label>
+      <textarea id="description" placeholder="Briefly describe your symptoms or reason for the visit"></textarea>
+
+      <button type="button" class="btn" id="bookBtn">Book Appointment</button>
+      <div class="status" id="bookStatus"></div>
+    </section>
+
+    <!-- ── Success card ─────────────────────────────────────────── -->
+    <section class="card hidden" id="successCard">
+      <div class="success-hero">
+        <div class="big">🎉</div>
+        <h2>Appointment Booked!</h2>
+        <p id="successText"></p>
+      </div>
+    </section>
+
+    <!-- ── Booking history (recalled on the next scan) ──────────── -->
+    <section class="card hidden" id="historyCard">
+      <h2>Your Bookings</h2>
+      <p class="sub">Appointments booked from this phone number.</p>
+      <div id="historyList"><div class="history-empty">Loading…</div></div>
+    </section>
+
+    <div class="foot">DrsListing · Your AI Health Assistant</div>
+  </main>
+
+  <!-- Toast for transient feedback (logout, errors, etc.) -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  // ═════════════════════════════════════════════════════════════════
+  // DrsListing — modern QR booking page (static, hosted on Vercel/Netlify)
+  //
+  // Flow:
+  //   1. Reads placeId + token (+ doctor name) from the URL.
+  //   2. Fetches the doctor's weekly availability (GET action=slots).
+  //   3. Step 1: saves name + mobile into the users table (POST
+  //      action=register) — the "register the patient first" step.
+  //   4. Step 2: 14-day date strip + time-slot chips exactly like the
+  //      Flutter booking screen (booked & past slots disabled).
+  //   5. POST action=book with the chosen date + time.
+  //   6. Booking history (GET action=history&mobile=…) is fetched and
+  //      shown at the bottom; the mobile number is kept in localStorage
+  //      so re-scanning the same QR code shows history automatically.
+  // ═════════════════════════════════════════════════════════════════
+
+  const SUPABASE_URL = 'https://qxukzqdsmlurollltrjp.supabase.co';
+  const FUNCTION_URL = SUPABASE_URL + '/functions/v1/booking-page';
+
+  // App store links (top-bar Download App). Android matches the
+  // com.drslisting.ai package. iOS is NOT on the App Store yet —
+  // point at the DrsListing landing page until it goes live, then set
+  // IOS_STORE_URL to the real https://apps.apple.com/app/id<...> link.
+  const ANDROID_STORE_URL = 'https://play.google.com/store/apps/details?id=com.drslisting.ai';
+  const IOS_STORE_URL = 'https://drslisting-booking.netlify.app';
+
+  const LS_MOBILE = 'drslisting_mobile';
+  const LS_NAME = 'drslisting_name';
+
+  const qs = new URLSearchParams(window.location.search);
+  const token = qs.get('token') || '';
+  const doctorName = qs.get('name') || '';
+  // placeId comes from the /book/<placeId> path (rewrites keep the URL
+  // unchanged); a ?doctor= query param is also accepted as a fallback.
+  const pathParts = window.location.pathname.split('/').filter(Boolean);
+  const placeId = qs.get('doctor') || (pathParts.length >= 2 ? pathParts[1] : '') || '';
+
+  const DAYS_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const TYPE_META = {
+    tele:   { emoji: '📞', label: 'Tele Consultation', color: '#1E3A8A' },
+    video:  { emoji: '🎥', label: 'Video Consultation', color: '#6B21A8' },
+    clinic: { emoji: '🏥', label: 'In-Clinic',          color: '#92400E' },
+  };
+
+  // State
+  let slotsData = [];           // doctor_slots rows (enabled only)
+  let bookedKeys = new Set();   // "YYYY-MM-DD|HH:MM AM" taken slots
+  let unavailableRanges = [];   // doctor-set unavailable date ranges [{start,end}]
+  let dateOptions = [];         // 14 days {iso, dayName, hasSlots}
+  let selectedDate = '';        // 'YYYY-MM-DD'
+  let selectedTime = '';        // '09:00 AM'
+  let selectedType = '';        // 'tele' | 'video' | 'clinic' — schedule type of the chosen slot
+  let patient = {
+    name: localStorage.getItem(LS_NAME) || '',
+    mobile: localStorage.getItem(LS_MOBILE) || '',
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => String(n).padStart(2, '0');
+
+  // ── Top-bar Download App dropdown ───────────────────────────────
+  $('dlBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    $('dlMenu').classList.toggle('open');
+  });
+  document.addEventListener('click', () => $('dlMenu').classList.remove('open'));
+  $('iosLink').href = IOS_STORE_URL;
+
+  // ── Init ─────────────────────────────────────────────────────────
+  function init() {
+    if (doctorName) {
+      $('pageTitle').textContent = 'Book with ' + doctorName;
+      $('doctorMeta').textContent = 'Doctor\'s Clinic';
+    }
+    // Session bar (below the header, above the doctor card) shows the
+    // patient's name + mobile + Logout once they're known — even on
+    // invalid/expired links.
+    updateSessionBar();
+    if (!token || !placeId) {
+      $('doctorCard').classList.add('hidden');
+      $('step1').classList.add('hidden');
+      $('step2').classList.add('hidden');
+      $('invalidCard').classList.remove('hidden');
+      return;
+    }
+    loadAvailability();
+    // Returning patient: prefill + jump straight to slot picking and
+    // show the history section at the bottom.
+    if (patient.mobile) {
+      $('name').value = patient.name;
+      $('mobile').value = patient.mobile;
+      $('step1').classList.add('hidden');
+      $('step2').classList.remove('hidden');
+      loadHistory();
+    }
+  }
+
+  // ── Fetch weekly availability + booked keys ──────────────────────
+  async function loadAvailability() {
+    try {
+      const res = await fetch(FUNCTION_URL + '?doctor=' + encodeURIComponent(placeId) +
+        '&token=' + encodeURIComponent(token) + '&action=slots');
+      const data = await res.json();
+      if (!data || !data.ok) throw new Error(data?.error || 'slots failed');
+      slotsData = (data.slots || []).filter(s => s.is_enabled);
+      bookedKeys = new Set(data.booked || []);
+      unavailableRanges = (data.doctor && Array.isArray(data.doctor.unavailable_ranges))
+        ? data.doctor.unavailable_ranges : [];
+      if (data.doctor) {
+        const d = data.doctor;
+        if (d.specialization) $('doctorMeta').textContent = d.specialization;
+        if (d.name && !doctorName) $('pageTitle').textContent = 'Book with ' + d.name;
+        renderDoctorLinks(d);
+      }
+      buildDateStrip();
+    } catch (err) {
+      $('slotArea').innerHTML =
+        '<div class="empty-note">Could not load availability. Please try again.</div>';
+    }
+  }
+
+  // True when the doctor marked this YYYY-MM-DD date unavailable.
+  function isDateUnavailable(iso) {
+    return unavailableRanges.some(r =>
+      r && r.start && r.end && iso >= r.start && iso <= r.end);
+  }
+
+  // ── 14-day date strip (starts today, like the app) ───────────────
+  function buildDateStrip() {
+    dateOptions = [];
+    const now = new Date();
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+      const iso = d.getFullYear() + '-' + fmt(d.getMonth() + 1) + '-' + fmt(d.getDate());
+      const dayName = DAYS_FULL[d.getDay()];
+      const hasSlots = slotsData.some(s =>
+        s.day_of_week === dayName && Array.isArray(s.slots) && s.slots.length > 0);
+      const unavail = isDateUnavailable(iso);
+      dateOptions.push({ iso, dayName, dateNum: d.getDate(), month: MONTHS[d.getMonth()], dayShort: DAYS_SHORT[d.getDay()], hasSlots: hasSlots && !unavail, unavail });
+    }
+
+    $('dateStrip').innerHTML = dateOptions.map((o, i) => dateChipHtml(o, i)).join('');
+
+    // Auto-select the first day with slots, skipping dates the doctor
+    // marked unavailable. If NO day in the window has slots, fall back to
+    // the first non-unavailable day (slot area explains "no slots") and if
+    // every day is unavailable, leave nothing selected and show that state.
+    // (hasSlots already excludes unavailable days, so the findIndex only
+    // needs to test hasSlots.)
+    const firstWithSlots = dateOptions.findIndex(o => o.hasSlots);
+    const firstAvailable = dateOptions.findIndex(o => !o.unavail);
+    const sel = firstWithSlots !== -1 ? firstWithSlots : firstAvailable;
+    if (sel === -1) {
+      // All 14 days unavailable — clear selection and show the notice.
+      selectedDate = '';
+      selectedTime = '';
+      selectedType = '';
+      $('dateStrip').innerHTML = dateOptions.map((o, i) => dateChipHtml(o, i)).join('');
+      $('slotArea').innerHTML =
+        '<div class="empty-note">The doctor is unavailable for the next two weeks. Please check back later.</div>';
+      // Nothing is bookable — disable the Book button instead of letting
+      // it answer with a confusing "Please select a date".
+      $('bookBtn').disabled = true;
+      return;
+    }
+    $('bookBtn').disabled = false;
+    selectedDate = dateOptions[sel].iso;
+    markChip(sel);
+    renderSlots();
+  }
+
+  // Single source of truth for a date-chip's markup (shared by the normal
+  // render and the all-unavailable render so the two can't drift).
+  function dateChipHtml(o, i) {
+    const isSel = dateOptions[i] && dateOptions[i].iso === selectedDate;
+    return `
+      <button type="button" class="date-chip${o.unavail ? ' unavailable' : (o.hasSlots ? '' : ' empty')}${isSel ? ' selected' : ''}"
+              data-i="${i}" ${o.hasSlots && !o.unavail ? '' : 'disabled'} title="${o.unavail ? 'Doctor unavailable on this date' : ''}">
+        <span class="d-day">${o.dayShort}</span>
+        <span class="d-num">${o.dateNum}</span>
+        <span class="d-month">${o.month}</span>
+        ${o.unavail ? '<span class="d-x">✕</span>' : (o.hasSlots ? '<span class="d-dot"></span>' : '')}
+      </button>`;
+  }
+
+  function markChip(idx) {
+    document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('selected'));
+    const chip = document.querySelector('.date-chip[data-i="' + idx + '"]');
+    if (chip) chip.classList.add('selected');
+  }
+
+  $('dateStrip').addEventListener('click', (e) => {
+    const chip = e.target.closest('.date-chip');
+    if (!chip || chip.disabled) return;
+    const i = Number(chip.dataset.i);
+    selectedDate = dateOptions[i].iso;
+    selectedTime = '';
+    markChip(i);
+    renderSlots();
+  });
+
+  // ── Render slot chips for the selected date (grouped by type) ────
+  function renderSlots() {
+    const opt = dateOptions.find(o => o.iso === selectedDate);
+    if (!opt) return;
+    if (opt.unavail) {
+      $('slotArea').innerHTML =
+        '<div class="empty-note">The doctor is unavailable on this date. Please pick another day.</div>';
+      return;
+    }
+    if (!opt.hasSlots) {
+      $('slotArea').innerHTML =
+        '<div class="empty-note">No slots available for this day. Try another date.</div>';
+      return;
+    }
+
+    const daySlots = slotsData.filter(s => s.day_of_week === opt.dayName);
+    const grouped = {};   // type -> { fee, times: [] }
+    for (const s of daySlots) {
+      if (!s.slots || !s.slots.length) continue;
+      if (!grouped[s.schedule_type]) grouped[s.schedule_type] = { fee: s.fee, times: [] };
+      grouped[s.schedule_type].times.push(...s.slots);
+    }
+
+    const now = new Date();
+    let html = '';
+    for (const [type, g] of Object.entries(grouped)) {
+      const meta = TYPE_META[type] || { emoji: '🩺', label: 'Consultation', color: 'var(--primary)' };
+      const times = [...new Set(g.times)].sort(compareTimes);
+      const chips = times.map(t => {
+        const booked = bookedKeys.has(selectedDate + '|' + t);
+        const past = !booked && slotInPast(opt, t, now);
+        const cls = booked ? 'disabled' : (past ? 'disabled past' : '');
+        const label = booked ? '🔒 Booked' : (past ? '⏳ ' + t : '🕐 ' + t);
+        return `<button type="button" class="slot-chip ${cls}" data-time="${t}" data-type="${type}" ${cls ? 'disabled' : ''}>${label}</button>`;
+      }).join('');
+      html += `
+        <div class="slot-group">
+          <div class="slot-type">
+            <span class="t-label" style="color:${meta.color}">${meta.emoji} ${meta.label}</span>
+            <span class="t-fee">₹${g.fee}</span>
+          </div>
+          <div class="slot-chips">${chips}</div>
+        </div>`;
+    }
+    $('slotArea').innerHTML = html || '<div class="empty-note">No slots available for this day.</div>';
+  }
+
+  $('slotArea').addEventListener('click', (e) => {
+    const chip = e.target.closest('.slot-chip');
+    if (!chip || chip.disabled) return;
+    document.querySelectorAll('.slot-chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    selectedTime = chip.dataset.time;
+    selectedType = chip.dataset.type || '';
+  });
+
+  // Is a slot for a given day already in the past (by current time)?
+  function slotInPast(opt, time, now) {
+    const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(time.trim());
+    if (!m) return false;
+    let h = Number(m[1]) % 12;
+    if (/pm/i.test(m[3])) h += 12;
+    // Reconstruct from parts to avoid TZ drift: opt.iso is local.
+    const [y, mo, day] = opt.iso.split('-').map(Number);
+    const slot = new Date(y, mo - 1, day, h, Number(m[2]));
+    return slot.getTime() < now.getTime();
+  }
+
+  // Compare "09:00 AM" / "10:30 PM" for sorting.
+  function compareTimes(a, b) {
+    return toMinutes(a) - toMinutes(b);
+  }
+  function toMinutes(t) {
+    const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(t.trim());
+    if (!m) return 0;
+    let h = Number(m[1]) % 12;
+    if (/pm/i.test(m[3])) h += 12;
+    return h * 60 + Number(m[2]);
+  }
+
+  // ── Step 1: save patient (register in users table) ───────────────
+  $('saveBtn').addEventListener('click', async () => {
+    const name = $('name').value.trim();
+    const mobile = $('mobile').value.replace(/\D/g, '');
+    const st = $('step1Status');
+    if (!name) { st.className = 'status err'; st.textContent = '❌ Please enter your full name.'; return; }
+    if (mobile.length < 7 || mobile.length > 15) {
+      st.className = 'status err'; st.textContent = '❌ Please enter a valid mobile number.'; return;
+    }
+
+    const btn = $('saveBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    try {
+      const res = await fetch(FUNCTION_URL + '?doctor=' + encodeURIComponent(placeId), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-booking-token': token },
+        body: JSON.stringify({ action: 'register', name, mobile }),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Could not save your details.');
+      patient = { name, mobile };
+      localStorage.setItem(LS_NAME, name);
+      localStorage.setItem(LS_MOBILE, mobile);
+      updateSessionBar();
+      $('step1').classList.add('hidden');
+      $('step2').classList.remove('hidden');
+      if (!dateOptions.length) loadAvailability();
+      renderSlots();
+    } catch (err) {
+      st.className = 'status err';
+      st.textContent = '❌ ' + (err.message || 'Network error. Please try again.');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Save & Continue';
+    }
+  });
+
+  // ── Step 2: book the selected slot ───────────────────────────────
+  $('bookBtn').addEventListener('click', async () => {
+    const st = $('bookStatus');
+    if (!selectedDate) { st.className = 'status err'; st.textContent = '❌ Please select a date.'; return; }
+    if (!selectedTime) { st.className = 'status err'; st.textContent = '❌ Please select a time slot.'; return; }
+    if (isDateUnavailable(selectedDate)) {
+      st.className = 'status err'; st.textContent = '❌ The doctor is unavailable on this date. Please pick another.'; return;
+    }
+    if (bookedKeys.has(selectedDate + '|' + selectedTime)) {
+      st.className = 'status err'; st.textContent = '❌ This slot was just booked. Please pick another.'; return;
+    }
+    const name = $('name').value.trim() || patient.name;
+    const mobile = $('mobile').value.replace(/\D/g, '') || patient.mobile;
+    if (!name || !mobile) {
+      $('step1').classList.remove('hidden');
+      st.className = 'status err'; st.textContent = '❌ Please enter your details first.';
+      return;
+    }
+
+    const btn = $('bookBtn');
+    btn.disabled = true; btn.textContent = 'Booking…';
+    st.className = 'status'; st.textContent = '';
+    try {
+      const res = await fetch(FUNCTION_URL + '?doctor=' + encodeURIComponent(placeId), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-booking-token': token },
+        body: JSON.stringify({
+          action: 'book',
+          name, mobile,
+          date: selectedDate,
+          time: selectedTime,
+          type: selectedType,   // tele/video/clinic — stored on the appointment
+          description: $('description').value.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Could not book the appointment.');
+      // Persist so the next scan recalls this patient + history.
+      patient = { name, mobile };
+      localStorage.setItem(LS_NAME, name);
+      localStorage.setItem(LS_MOBILE, mobile);
+      updateSessionBar();
+      // Success card — the fee chip appears when the chosen slot
+      // carries a consultation fee (recorded as a Pending offline
+      // payment by the function; the clinic settles it on arrival).
+      const paySummary = paymentSummary(data.payment);
+      $('successText').innerHTML =
+        '<b>' + (data.doctorName || doctorName || 'Your doctor') + '</b><br>' +
+        data.date + ' · ' + data.time + '<br><small>Ref: ' + (data.appointmentId || '') + '</small>' +
+        (paySummary ? '<br><span class="pay-chip">💵 ' + paySummary + '</span>' : '');
+      $('successCard').classList.remove('hidden');
+      $('successCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Mark the slot as taken locally + refresh history.
+      bookedKeys.add(selectedDate + '|' + selectedTime);
+      selectedTime = '';
+      selectedType = '';
+      renderSlots();
+      loadHistory();
+    } catch (err) {
+      st.className = 'status err';
+      st.textContent = '❌ ' + (err.message || 'Network error. Please try again.');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Book Appointment';
+    }
+  });
+
+  // ── Booking history (bottom of the page) ─────────────────────────
+  // Each booking renders as a collapsible accordion: the header shows
+  // doctor + date/time + status badge + chevron, and clicking it expands
+  // the full appointment details (Booking ID, consultation type, patient,
+  // mobile, symptoms, booked-on) below it. Opening one closes the others.
+  async function loadHistory() {
+    const mobile = patient.mobile || $('mobile').value.replace(/\D/g, '');
+    if (!mobile) return;
+    const card = $('historyCard');
+    card.classList.remove('hidden');
+    try {
+      const res = await fetch(FUNCTION_URL + '?doctor=' + encodeURIComponent(placeId) +
+        '&token=' + encodeURIComponent(token) + '&action=history&mobile=' + encodeURIComponent(mobile));
+      const data = await res.json();
+      const list = $('historyList');
+      if (!data || !data.ok || !Array.isArray(data.appointments) || !data.appointments.length) {
+        list.innerHTML = '<div class="history-empty">No bookings yet — your appointments will appear here.</div>';
+        return;
+      }
+      list.innerHTML = data.appointments.map(a => {
+        // Whitelist the badge class — the DB constrains status to an
+        // IN-list, but never interpolate a raw server value into HTML.
+        const status = (a.status || 'Pending').toLowerCase();
+        const statusCls = ['pending', 'upcoming', 'completed', 'cancelled'].includes(status) ? status : 'pending';
+        const typeMeta = TYPE_META[(a.consultation_type || '').toLowerCase()];
+        // Doctor snapshot (JSONB) — clinic/hospital name + address live
+        // here for web-created rows; legacy app rows store the same keys.
+        const dd = (a.doctor_details && typeof a.doctor_details === 'object')
+          ? a.doctor_details : {};
+        const rows = [
+          ['🔖', 'Booking ID', a.appointment_id || '—'],
+          ['📌', 'Status', a.status || 'Pending'],
+        ];
+        if (typeMeta) rows.push([typeMeta.emoji, 'Consultation', typeMeta.label]);
+        // Consultation fee (when the booking carried one) — amount +
+        // payment method + settlement status, e.g. "₹800 · Offline (Clinic)".
+        const paySummary = paymentSummary(a.payment);
+        if (paySummary) rows.push(['💵', 'Fee', paySummary]);
+        // Clinic / hospital name (skip when it merely duplicates the name).
+        const clinic = (dd.hospital_name || '').toString().trim();
+        if (clinic && clinic.toLowerCase() !== (a.doctor_name || '').toLowerCase()) {
+          rows.push(['🏥', 'Clinic', clinic]);
+        }
+        const addr = (dd.address || dd.vicinity || '').toString().trim();
+        if (addr) rows.push(['📍', 'Address', addr]);
+        // Clinic phone — tap to call. Prefer the international number;
+        // fall back to the local one. Rows with a 4th element 'html' are
+        // rendered as-is (the value is trusted markup built below).
+        const clinicPhone = (dd.international_phone_number || dd.phone_number || '')
+          .toString().trim();
+        const telDigits = clinicPhone.replace(/[^\d+]/g, '');
+        if (clinicPhone && telDigits) {
+          rows.push(['☎️', 'Clinic Phone',
+            `<a class="dlink" href="${escapeHtml('tel:' + telDigits)}">${escapeHtml(clinicPhone)}</a>`, 'html']);
+        }
+        // Get Directions — Google Maps links via the best-known location
+        // (shared helper used by the header card too). Passing the doctor
+        // name pins the map to the exact listing with its label.
+        const dirUrl = dirLinkUrl(dd, a.doctor_name);
+        if (dirUrl) {
+          rows.push(['🧭', 'Directions',
+            `<a class="dlink dir-link" href="${escapeHtml(dirUrl)}" target="_blank" rel="noopener">🗺️ Get Directions</a>`, 'html']);
+        }
+        if (a.patient_name) rows.push(['👤', 'Patient', a.patient_name]);
+        // Patient mobile — tap to call. Built from the stored digits so
+        // the tel: href is always a clean number.
+        const patientDigits = String(a.patient_phone || '').replace(/\D/g, '');
+        if (a.patient_phone && patientDigits) {
+          rows.push(['📞', 'Mobile',
+            `<a class="dlink" href="${escapeHtml('tel:' + patientDigits)}">${escapeHtml(a.patient_phone)}</a>`, 'html']);
+        }
+        if (a.symptoms) rows.push(['🩹', 'Symptoms', a.symptoms]);
+        if (a.created_at) rows.push(['🗓️', 'Booked on', fmtDateTime(a.created_at)]);
+        const detailHtml = rows.map(r =>
+          `<div class="detail-row"><span class="d-ic">${r[0]}</span>` +
+          `<span class="d-label">${escapeHtml(r[1])}</span>` +
+          `<span class="d-value">${r[3] === 'html' ? r[2] : escapeHtml(r[2])}</span></div>`
+        ).join('');
+        // Prescription photos (public storage URLs) — clickable thumbnails
+        // that open the full image in a new tab.
+        const rxUrls = (Array.isArray(a.upload_prescription) ? a.upload_prescription : [])
+          .map(u => (u || '').toString()).filter(Boolean);
+        const rxHtml = rxUrls.length
+          ? '<div class="detail-row"><span class="d-ic">💊</span>' +
+            '<span class="d-label">Prescription</span>' +
+            '<span class="d-value"><div class="rx-thumbs">' +
+            rxUrls.map(u =>
+              `<a class="rx-thumb" href="${escapeHtml(u)}" target="_blank" rel="noopener" title="Open prescription photo">` +
+              `<img src="${escapeHtml(u)}" alt="Prescription photo" loading="lazy"` +
+              ` onerror="rxThumbFailed(this)"></a>`
+            ).join('') +
+            '</div></span></div>'
+          : '';
+        const bodyHtml = detailHtml + rxHtml;
+        return `
+          <div class="history-item">
+            <button type="button" class="acc-head" aria-expanded="false">
+              <div class="h-ic">🩺</div>
+              <div class="h-main">
+                <div class="h-doctor">${escapeHtml(a.doctor_name || 'Doctor')}</div>
+                <div class="h-meta">📅 ${escapeHtml(fmtDate(a.appointment_date || ''))} · 🕐 ${escapeHtml(a.appointment_time || 'Flexible')}</div>
+              </div>
+              <span class="badge ${statusCls}">${escapeHtml(a.status || 'Pending')}</span>
+              <span class="chev">▾</span>
+            </button>
+            <div class="acc-body"><div class="acc-inner">${bodyHtml}</div></div>
+          </div>`;
+      }).join('');
+    } catch (err) {
+      $('historyList').innerHTML = '<div class="history-empty">Could not load your bookings.</div>';
+    }
+  }
+
+  // Collapsible accordion: clicking a header expands its details and
+  // collapses any other open item (classic accordion behaviour).
+  $('historyList').addEventListener('click', (e) => {
+    const head = e.target.closest('.acc-head');
+    if (!head) return;
+    const wasOpen = head.classList.contains('open');
+    document.querySelectorAll('#historyList .acc-head').forEach((h) => {
+      h.classList.remove('open');
+      h.setAttribute('aria-expanded', 'false');
+      const body = h.nextElementSibling;
+      if (body && body.classList.contains('acc-body')) body.classList.remove('open');
+    });
+    if (!wasOpen) {
+      head.classList.add('open');
+      head.setAttribute('aria-expanded', 'true');
+      const body = head.nextElementSibling;
+      if (body && body.classList.contains('acc-body')) body.classList.add('open');
+    }
+  });
+
+  // ── Session bar + Logout ────────────────────────────────────────
+  // The bar sits below the header, above the "Book With" doctor card:
+  // patient's name + mobile on the left, Logout on the right. It is
+  // shown whenever a saved session exists on this device.
+  function updateSessionBar() {
+    const hasSession = !!(patient.name && patient.mobile);
+    $('sessionBar').classList.toggle('hidden', !hasSession);
+    if (hasSession) {
+      $('sessionName').textContent = patient.name;
+      const digits = String(patient.mobile || '').replace(/\D/g, '');
+      $('sessionMobile').textContent = fmtMobile(digits);
+      // Tap-to-call: the session-bar number becomes a tel: link.
+      $('sessionMobile').href = digits ? 'tel:' + digits : '#';
+      $('sessionMobile').setAttribute('aria-label', 'Call ' + fmtMobile(digits));
+      $('sessionAvatar').textContent = initials(patient.name);
+    }
+  }
+
+  // Initials for the avatar circle, e.g. "Rahul Sharma" → "RS".
+  function initials(name) {
+    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return parts.length ? parts[0][0].toUpperCase() : '👤';
+  }
+
+  // Format a stored mobile number for display (+91 98765 43210 for the
+  // common 10-digit form; otherwise show the digits as-is).
+  function fmtMobile(m) {
+    const digits = String(m || '').replace(/\D/g, '');
+    if (digits.length === 10) return '+91 ' + digits.slice(0, 5) + ' ' + digits.slice(5);
+    if (digits.length === 12 && digits.startsWith('91')) {
+      return '+91 ' + digits.slice(2, 7) + ' ' + digits.slice(7);
+    }
+    return digits || '—';
+  }
+
+  // 'YYYY-MM-DD' → '6 Aug 2026'
+  function fmtDate(iso) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+    if (!m) return iso || '—';
+    const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    if (isNaN(d)) return iso;
+    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  // ISO timestamp → '6 Aug 2026, 14:05'
+  function fmtDateTime(isoTs) {
+    const d = new Date(isoTs);
+    if (isNaN(d)) return isoTs;
+    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() +
+      ', ' + fmt(d.getHours()) + ':' + fmt(d.getMinutes());
+  }
+
+  // Payment summary for the success card + history accordion. Accepts
+  // the { amount, method, status, currency } object the function returns
+  // (from the payments row) and renders e.g. '₹800 · Offline (Clinic)' —
+  // the method label mirrors the app (Online (UPI) / Offline (Clinic))
+  // and the status is appended when it isn't the default 'Pending'.
+  // Returns '' when there is no payment (fee-less booking).
+  function paymentSummary(p) {
+    if (!p) return '';
+    const amount = Number(p.amount);
+    if (!(amount > 0)) return '';
+    const label = p.method === 'online' ? 'Online (UPI)' : 'Offline (Clinic)';
+    let s = '₹' + (Number.isInteger(amount) ? amount : amount.toFixed(2)) + ' · ' + label;
+    if (p.status && p.status !== 'Pending') s += ' · ' + p.status;
+    return s;
+  }
+
+  // Transient bottom toast for feedback (logout, errors).
+  let toastTimer = null;
+  function toast(msg) {
+    const t = $('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  // Logout: clear the saved session on this device and reset the whole
+  // flow back to step 1 (patient details), hiding history + success.
+  $('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem(LS_NAME);
+    localStorage.removeItem(LS_MOBILE);
+    patient = { name: '', mobile: '' };
+    $('name').value = '';
+    $('mobile').value = '';
+    $('description').value = '';
+    $('step1').classList.remove('hidden');
+    $('step2').classList.add('hidden');
+    $('successCard').classList.add('hidden');
+    $('historyCard').classList.add('hidden');
+    selectedDate = '';
+    selectedTime = '';
+    selectedType = '';
+    updateSessionBar();
+    toast('Logged out — your details were cleared');
+    $('step1').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // ── Doctor-card Call + Get Directions quick links ─────────────────
+  // Shown under the doctor's name on the header card, fed by the same
+  // slots-payload doctor object the title/subtitle use.
+  function renderDoctorLinks(d) {
+    const box = $('doctorLinks');
+    if (!box) return;
+    const links = [];
+    const phone = (d.international_phone_number || d.phone_number || '')
+      .toString().trim();
+    const telDigits = phone.replace(/[^\d+]/g, '');
+    if (phone && telDigits) {
+      links.push(`<a class="dlink" href="${escapeHtml('tel:' + telDigits)}" aria-label="Call the clinic">☎️ ${escapeHtml(phone)}</a>`);
+    }
+    const dirUrl = dirLinkUrl(d, d.name);
+    if (dirUrl) {
+      links.push(`<a class="dlink dir-link" href="${escapeHtml(dirUrl)}" target="_blank" rel="noopener">🗺️ Get Directions</a>`);
+    }
+    box.innerHTML = links.join('');
+  }
+
+  // Google Maps directions URL from a doctor snapshot. When a place_id
+  // exists, the destination text is the doctor/clinic name AND
+  // destination_place_id pins the map to the exact listing with its
+  // official name + marker. Falls back to coordinates, then the address.
+  // Returns '' when there's no location info at all.
+  function dirLinkUrl(src, displayName) {
+    const s = (src && typeof src === 'object') ? src : {};
+    const addr = (s.address || s.vicinity || '').toString().trim();
+    // Guard against raw DB nulls: Number(null) === 0 would pass an
+    // isFinite check and produce a bogus 0,0 destination.
+    const lat = Number(s.latitude);
+    const lng = Number(s.longitude);
+    const hasCoords = s.latitude != null && s.longitude != null &&
+      Number.isFinite(lat) && Number.isFinite(lng);
+    const placeId = (s.place_id || '').toString().trim();
+    const name = String(displayName || s.name || '').trim();
+    if (placeId) {
+      const q = name || placeId;
+      return 'https://www.google.com/maps/dir/?api=1&destination=' +
+        encodeURIComponent(q) +
+        '&destination_place_id=' + encodeURIComponent(placeId);
+    }
+    if (hasCoords) {
+      return 'https://www.google.com/maps/dir/?api=1&destination=' +
+        encodeURIComponent(lat + ',' + lng);
+    }
+    return addr
+      ? 'https://www.google.com/maps/dir/?api=1&destination=' +
+        encodeURIComponent(addr)
+      : '';
+  }
+
+  function escapeHtml(v) {
+    return String(v).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    }[c]));
+  }
+
+  // A prescription image failed to load (expired storage URL, network
+  // blip, etc.) — replace the broken <img> with a visible locked/error
+  // tile instead of silently hiding the thumbnail. The link stays live
+  // so the patient can still tap to retry the full image in a new tab.
+  function rxThumbFailed(img) {
+    const tile = img && img.closest('.rx-thumb');
+    if (!tile || tile.classList.contains('failed')) return;
+    tile.classList.add('failed');
+    tile.title = 'Prescription photo unavailable — tap to retry';
+    tile.setAttribute('aria-label', 'Prescription photo unavailable');
+    tile.innerHTML =
+      '<span class="rx-fail-ic">🔒</span>' +
+      '<span class="rx-fail-tx">Unavailable</span>';
+  }
+
+  init();
+</script>
+</body>
+</html>

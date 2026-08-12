@@ -1,0 +1,23 @@
+{
+  "rewrites": [
+    {
+      "source": "/book/:placeId",
+      "destination": "/booking.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/manage-slots/:placeId",
+      "destination": "https://play.google.com/store/apps/details?id=com.drslisting.ai",
+      "permanent": false
+    }
+  ],
+  "headers": [
+    {
+      "source": "/.well-known/(.*)",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json" }
+      ]
+    }
+  ]
+}
