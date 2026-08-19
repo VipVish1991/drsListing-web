@@ -117,3 +117,4 @@ see section 2b):
 > **Note:** the `token` shared secret is embedded in the redirect rules here
 > (same value as `AppConstants.bookingSharedSecret`). If you rotate it, update
 > `netlify.toml`/`vercel.json` **and** `lib/config/constants.dart` together.
+# Force redeploy Wed Aug 19 19:14:26 IST 2026
