@@ -629,14 +629,33 @@
   const LS_MOBILE = 'drslisting_mobile';
   const LS_NAME = 'drslisting_name';
 
+  // Try query params first, then path, then hash fragment.
+  // Old QR codes may have #/web-booking?doctor=...&token=... from the
+  // removed Flutter web app — parse those as a fallback.
   const qs = new URLSearchParams(window.location.search);
-  const token = qs.get('token') || '';
-  const doctorName = qs.get('name') || '';
-  // placeId comes from the /book/<placeId> path (rewrites keep the URL
-  // unchanged); a ?doctor= query param is also accepted as a fallback.
+  let token = qs.get('token') || '';
+  let doctorName = qs.get('name') || '';
   const pathParts = window.location.pathname.split('/').filter(Boolean);
-  const placeId = qs.get('doctor') || (pathParts.length >= 2 ? pathParts[1] : '') || '';
-
+  let placeId = qs.get('doctor') || (pathParts.length >= 2 ? pathParts[1] : '') || '';
+  // Fallback: parse #/web-booking?doctor=...&token=... hash fragment
+  // from old QR codes (removed Flutter web app hash route).
+  if (!token || !placeId) {
+    const hash = window.location.hash || '';
+    const hashMatch = hash.match(/\?([^#]*)/);
+    if (hashMatch) {
+      const hq = new URLSearchParams(hashMatch[1]);
+      if (!placeId) placeId = hq.get('doctor') || '';
+      if (!token) token = hq.get('token') || '';
+      if (!doctorName) doctorName = hq.get('name') || '';
+      // Clean URL so re-reads don't re-parse.
+      if (placeId && token) {
+        const p = new URLSearchParams();
+        p.set('doctor', placeId); p.set('token', token);
+        if (doctorName) p.set('name', doctorName);
+        window.history.replaceState({}, '', window.location.pathname + '?' + p.toString());
+      }
+    }
+  }
   const DAYS_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
