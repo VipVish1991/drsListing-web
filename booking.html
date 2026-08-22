@@ -3,29 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book an Appointment</title>
+  <title>Book an Appointment — DrsListing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #F7F2E8;
+      --bg: #F4F1EC;
       --card: #FFFFFF;
-      --primary: #0E7C66;
-      --primary-2: #12A48B;
-      --text: #1F2933;
+      --primary: #0D7C5F;
+      --primary-2: #10B981;
+      --primary-soft: rgba(13,124,95,0.08);
+      --text: #111827;
       --body: #6B7280;
       --caption: #9CA3AF;
       --border: #E5E7EB;
-      --surface: #FAFAF9;
-      --tele: #1E3A8A;
-      --video: #6B21A8;
-      --clinic: #92400E;
+      --surface: #F9FAFB;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+      --radius: 16px;
+      --radius-lg: 20px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { -webkit-text-size-adjust: 100%; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       min-height: 100vh;
       color: var(--text);
+      -webkit-font-smoothing: antialiased;
     }
 
     /* ── Top bar with Download App ─────────────────────────────── */
@@ -33,42 +40,43 @@
       position: sticky; top: 0; z-index: 50;
       display: flex; align-items: center; justify-content: space-between;
       gap: 12px;
-      padding: 14px 20px;
-      background: rgba(247, 242, 232, 0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(0,0,0,0.05);
+      padding: 12px 20px;
+      background: rgba(244,241,236,0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,0,0,0.04);
     }
     .brand { display: flex; align-items: center; gap: 10px; }
     .brand .logo {
-      width: 38px; height: 38px; border-radius: 12px;
+      width: 36px; height: 36px; border-radius: 10px;
       background: linear-gradient(135deg, var(--primary), var(--primary-2));
       display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 4px 12px rgba(14,124,102,0.3);
+      font-size: 18px;
+      box-shadow: 0 2px 8px rgba(13,124,95,0.25);
     }
-    .brand .name { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+    .brand .name { font-size: 16px; font-weight: 800; letter-spacing: -0.3px; }
     .brand .name span { color: var(--primary); }
     .dl-wrap { position: relative; }
     .dl-btn {
-      display: flex; align-items: center; gap: 7px;
-      padding: 10px 16px;
+      display: flex; align-items: center; gap: 6px;
+      padding: 9px 16px;
       border: none; border-radius: 999px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-2));
-      color: #fff; font-size: 13.5px; font-weight: 700;
+      background: var(--text);
+      color: #fff; font-size: 13px; font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(14,124,102,0.35);
+      box-shadow: var(--shadow-sm);
       transition: transform 0.15s, opacity 0.2s;
     }
-    .dl-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+    .dl-btn:hover { opacity: 0.9; transform: translateY(-1px); }
     .dl-btn:active { transform: translateY(0); }
     .dl-menu {
       position: absolute; right: 0; top: calc(100% + 8px);
-      min-width: 230px;
-      background: var(--card); border-radius: 18px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.16);
-      padding: 8px;
+      min-width: 240px;
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      padding: 6px;
       display: none;
-      flex-direction: column; gap: 4px;
+      flex-direction: column; gap: 2px;
       z-index: 60;
     }
     .dl-menu.open { display: flex; }
@@ -78,9 +86,9 @@
       text-decoration: none; color: var(--text);
       transition: background 0.15s;
     }
-    .dl-menu a:hover { background: var(--bg); }
+    .dl-menu a:hover { background: var(--surface); }
     .store-ic {
-      width: 32px; height: 32px; border-radius: 9px;
+      width: 32px; height: 32px; border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
       font-size: 16px; color: #fff; flex-shrink: 0;
     }
@@ -89,43 +97,41 @@
     .store-name { font-size: 13.5px; font-weight: 700; }
     .store-sub { font-size: 11px; color: var(--caption); }
 
-    /* ── Session bar (below the header, above the doctor card) ───── */
+    /* ── Session bar ──────────────────────────────────────────── */
     .session-bar {
       display: flex; align-items: center; gap: 12px;
       margin-bottom: 16px;
       padding: 14px 16px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(14,124,102,0.10), rgba(18,164,139,0.04));
-      border: 1px solid rgba(14,124,102,0.24);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border-radius: var(--radius);
+      background: var(--primary-soft);
+      border: 1px solid rgba(13,124,95,0.15);
     }
     .session-bar .s-avatar {
-      width: 42px; height: 42px; border-radius: 50%;
+      width: 40px; height: 40px; border-radius: 50%;
       background: linear-gradient(135deg, var(--primary), var(--primary-2));
       display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 16px; font-weight: 800; flex-shrink: 0;
-      box-shadow: 0 4px 10px rgba(14,124,102,0.3);
+      color: #fff; font-size: 14px; font-weight: 800; flex-shrink: 0;
     }
     .session-bar .s-info { flex: 1; min-width: 0; }
     .session-bar .s-name {
-      font-size: 15px; font-weight: 800; color: var(--text);
+      font-size: 14px; font-weight: 700; color: var(--text);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .session-bar .s-mobile {
       display: inline-block; font-size: 12.5px; color: var(--body); font-weight: 500;
       margin-top: 1px; text-decoration: none;
-      border-bottom: 1px dashed rgba(14,124,102,0.35);
+      border-bottom: 1px dashed rgba(13,124,95,0.35);
       transition: color 0.15s, border-color 0.15s;
     }
     .session-bar .s-mobile:hover { color: var(--primary); border-bottom-style: solid; }
     .logout-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 9px 15px;
-      border: 1.5px solid #FCA5A5;
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 8px 14px;
+      border: 1px solid #FCA5A5;
       border-radius: 999px;
       background: #FEF2F2;
       color: #B91C1C;
-      font-size: 12.5px; font-weight: 700; font-family: inherit;
+      font-size: 12px; font-weight: 600; font-family: inherit;
       cursor: pointer;
       transition: background 0.15s, transform 0.15s;
     }
@@ -148,56 +154,57 @@
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
     /* ── Layout ────────────────────────────────────────────────── */
-    .container { max-width: 620px; margin: 0 auto; padding: 20px 16px 48px; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px 16px 48px; }
     .card {
       background: var(--card);
-      border-radius: 22px;
-      box-shadow: 0 6px 24px rgba(31,41,51,0.07);
-      padding: 22px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 24px;
       margin-bottom: 16px;
+      border: 1px solid rgba(0,0,0,0.03);
     }
     .hidden { display: none !important; }
-    h2 { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
-    .sub { font-size: 13px; color: var(--body); margin-bottom: 14px; }
+    h2 { font-size: 16px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.2px; }
+    .sub { font-size: 13px; color: var(--body); margin-bottom: 14px; line-height: 1.5; }
 
     /* Doctor card */
     .doctor-card { display: flex; align-items: flex-start; gap: 14px; }
     .avatar {
-      width: 56px; height: 56px; border-radius: 18px;
+      width: 52px; height: 52px; border-radius: 14px;
       background: linear-gradient(135deg, var(--primary), var(--primary-2));
       display: flex; align-items: center; justify-content: center;
-      font-size: 28px; flex-shrink: 0;
-      box-shadow: 0 6px 16px rgba(14,124,102,0.3);
+      font-size: 26px; flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(13,124,95,0.2);
     }
-    .doctor-card h1 { font-size: 19px; font-weight: 800; line-height: 1.25; }
+    .doctor-card h1 { font-size: 18px; font-weight: 800; line-height: 1.25; letter-spacing: -0.3px; }
     .doctor-card .meta { font-size: 13px; color: var(--primary); font-weight: 600; margin-top: 2px; }
     /* Call / Directions quick links under the doctor name (same data as
        the history accordion rows, shown right on the booking card). */
     .doctor-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .doctor-links a.dlink {
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 7px 13px;
+      padding: 7px 12px;
       border-radius: 999px;
-      background: rgba(14,124,102,0.08);
-      border: 1.5px solid rgba(14,124,102,0.25);
-      color: var(--primary); font-size: 12.5px; font-weight: 700;
+      background: var(--primary-soft);
+      border: 1px solid rgba(13,124,95,0.2);
+      color: var(--primary); font-size: 12px; font-weight: 600;
       text-decoration: none;
       transition: background 0.15s, border-color 0.15s, transform 0.15s;
     }
     .doctor-links a.dlink:hover {
-      background: rgba(14,124,102,0.14);
+      background: rgba(13,124,95,0.14);
       border-color: var(--primary);
       transform: translateY(-1px);
     }
     .doctor-links a.dlink:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
     /* Form */
-    label { font-size: 12.5px; font-weight: 700; color: var(--text); display: block; margin: 14px 0 6px; }
+    label { font-size: 12px; font-weight: 600; color: var(--text); display: block; margin: 14px 0 6px; letter-spacing: 0.1px; }
     input, textarea {
       width: 100%;
-      padding: 13px 15px;
+      padding: 12px 14px;
       border: 1.5px solid var(--border);
-      border-radius: 14px;
+      border-radius: 12px;
       font-size: 15px;
       font-family: inherit;
       background: var(--surface);
@@ -207,66 +214,66 @@
     input:focus, textarea:focus {
       border-color: var(--primary);
       background: #fff;
-      box-shadow: 0 0 0 4px rgba(14,124,102,0.1);
+      box-shadow: 0 0 0 3px rgba(13,124,95,0.1);
     }
-    textarea { resize: vertical; min-height: 84px; }
+    textarea { resize: vertical; min-height: 80px; }
 
     .btn {
       width: 100%;
       margin-top: 20px;
-      padding: 15px;
+      padding: 14px;
       background: linear-gradient(135deg, var(--primary), var(--primary-2));
       color: #fff;
       border: none;
-      border-radius: 15px;
-      font-size: 16px;
-      font-weight: 800;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 6px 18px rgba(14,124,102,0.35);
+      box-shadow: 0 4px 12px rgba(13,124,95,0.25);
       transition: opacity 0.2s, transform 0.15s;
     }
     .btn:hover:not(:disabled) { opacity: 0.92; transform: translateY(-1px); }
     .btn:active:not(:disabled) { transform: translateY(0); }
-    .btn:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 
-    /* Date strip (14 days, like the app) */
+    /* Date strip */
     .date-strip {
       display: flex; gap: 8px; overflow-x: auto;
-      padding: 6px 2px 12px;
+      padding: 4px 2px 12px;
       scrollbar-width: none;
     }
     .date-strip::-webkit-scrollbar { display: none; }
     .date-chip {
       flex: 0 0 auto;
-      width: 62px;
+      width: 58px;
       padding: 10px 4px 8px;
-      border-radius: 16px;
+      border-radius: 14px;
       border: 1.5px solid var(--border);
       background: var(--card);
       cursor: pointer;
       display: flex; flex-direction: column; align-items: center; gap: 2px;
       transition: all 0.18s;
     }
-    .date-chip .d-day { font-size: 11px; font-weight: 700; color: var(--caption); }
-    .date-chip .d-num { font-size: 19px; font-weight: 800; color: var(--text); line-height: 1.1; }
-    .date-chip .d-month { font-size: 9.5px; font-weight: 600; color: var(--caption); }
-    .date-chip .d-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); margin-top: 3px; }
+    .date-chip .d-day { font-size: 11px; font-weight: 600; color: var(--caption); }
+    .date-chip .d-num { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1.1; }
+    .date-chip .d-month { font-size: 10px; font-weight: 600; color: var(--caption); }
+    .date-chip .d-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--primary); margin-top: 3px; }
     .date-chip:hover { border-color: var(--primary); }
     .date-chip.selected {
       background: linear-gradient(135deg, var(--primary), var(--primary-2));
       border-color: transparent;
-      box-shadow: 0 6px 16px rgba(14,124,102,0.35);
+      box-shadow: 0 4px 12px rgba(13,124,95,0.3);
     }
     .date-chip.selected .d-day,
     .date-chip.selected .d-month,
     .date-chip.selected .d-num { color: #fff; }
     .date-chip.selected .d-dot { background: #fff; }
-    .date-chip.empty { opacity: 0.45; cursor: default; }
+    .date-chip.empty { opacity: 0.4; cursor: default; }
     .date-chip.empty:hover { border-color: var(--border); }
     .date-chip.unavailable {
-      background: rgba(220, 38, 38, 0.08);
-      border-color: rgba(220, 38, 38, 0.35);
-      opacity: 0.85;
+      background: rgba(220, 38, 38, 0.06);
+      border-color: rgba(220, 38, 38, 0.3);
+      opacity: 0.8;
       cursor: default;
     }
     .date-chip.unavailable .d-day,
@@ -275,16 +282,14 @@
     .date-chip.unavailable .d-x {
       display: inline-block;
       margin-top: 3px;
-      width: 16px;
-      height: 16px;
+      width: 16px; height: 16px;
       line-height: 15px;
       border-radius: 50%;
-      background: rgba(220, 38, 38, 0.18);
+      background: rgba(220, 38, 38, 0.15);
       color: #B91C1C;
-      font-size: 10px;
-      font-weight: 800;
+      font-size: 10px; font-weight: 800;
     }
-    .date-chip.unavailable:hover { border-color: rgba(220, 38, 38, 0.35); }
+    .date-chip.unavailable:hover { border-color: rgba(220, 38, 38, 0.3); }
 
     /* Slot groups */
     .slot-group { margin-bottom: 16px; }
@@ -292,20 +297,20 @@
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 8px;
     }
-    .slot-type .t-label { font-size: 13px; font-weight: 700; }
+    .slot-type .t-label { font-size: 13px; font-weight: 600; }
     .slot-type .t-fee {
       font-size: 11px; font-weight: 700;
-      padding: 3px 9px; border-radius: 999px;
-      background: rgba(14,124,102,0.1); color: var(--primary);
+      padding: 3px 10px; border-radius: 999px;
+      background: var(--primary-soft); color: var(--primary);
     }
     .slot-chips { display: flex; flex-wrap: wrap; gap: 8px; }
     .slot-chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 10px 13px;
-      border-radius: 13px;
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 10px 14px;
+      border-radius: 12px;
       border: 1.5px solid var(--border);
       background: var(--card);
-      font-size: 13px; font-weight: 700; color: var(--text);
+      font-size: 13px; font-weight: 600; color: var(--text);
       cursor: pointer;
       transition: all 0.15s;
     }
@@ -313,7 +318,7 @@
     .slot-chip.selected {
       background: linear-gradient(135deg, var(--primary), var(--primary-2));
       border-color: transparent; color: #fff;
-      box-shadow: 0 4px 12px rgba(14,124,102,0.3);
+      box-shadow: 0 3px 10px rgba(13,124,95,0.25);
     }
     .slot-chip.disabled {
       background: var(--surface);
@@ -325,10 +330,10 @@
     .slot-chip.past { text-decoration: line-through; }
     .empty-note {
       padding: 16px;
-      border-radius: 14px;
+      border-radius: 12px;
       background: var(--surface);
       color: var(--caption);
-      font-size: 13.5px;
+      font-size: 13px;
       text-align: center;
     }
 
@@ -336,8 +341,8 @@
     .status {
       margin-top: 14px;
       padding: 12px 14px;
-      border-radius: 13px;
-      font-size: 13.5px;
+      border-radius: 12px;
+      font-size: 13px;
       line-height: 1.5;
       display: none;
     }
@@ -345,28 +350,14 @@
     .status.err { display: block; background: #FEF2F2; color: #991B1B; }
     .success-hero { text-align: center; padding: 12px 0 4px; }
     .success-hero .big {
-      width: 64px; height: 64px; margin: 0 auto 12px;
+      width: 60px; height: 60px; margin: 0 auto 12px;
       border-radius: 50%;
-      background: rgba(18,164,139,0.12);
+      background: rgba(16,185,129,0.12);
       display: flex; align-items: center; justify-content: center;
-      font-size: 32px;
+      font-size: 28px;
     }
-    .success-hero h2 { font-size: 20px; margin-bottom: 6px; }
-    .success-hero p { font-size: 13.5px; color: var(--body); line-height: 1.5; }
-    /* Consultation fee chip shown on the success card when the booked
-       slot carries a fee (pay-at-clinic — the web flow has no UPI
-       intent, so the amount is informational + the status label). */
-    .success-hero .pay-chip {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 7px 16px;
-      border-radius: 999px;
-      background: rgba(14, 124, 102, 0.1);
-      border: 1px solid rgba(14, 124, 102, 0.3);
-      color: var(--primary);
-      font-size: 13px;
-      font-weight: 800;
-    }
+    .success-hero h2 { font-size: 19px; margin-bottom: 6px; }
+    .success-hero p { font-size: 13px; color: var(--body); line-height: 1.5; }
 
     /* History — collapsible accordion items */
     .history-item {
@@ -478,14 +469,57 @@
     .badge.cancelled { background: #FEF2F2; color: #991B1B; }
     .history-empty { color: var(--caption); font-size: 13.5px; text-align: center; padding: 8px 0; }
 
+    /* ── Download-app banner for tele/video slots ──────────────── */
+    .app-banner {
+      margin-top: 8px;
+      margin-bottom: 16px;
+      padding: 20px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, #EFF6FF 0%, #F0FDF4 100%);
+      border: 1px solid rgba(13,124,95,0.15);
+      text-align: center;
+    }
+    .app-banner .ab-icon {
+      font-size: 32px; margin-bottom: 8px;
+    }
+    .app-banner h3 {
+      font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--text);
+    }
+    .app-banner p {
+      font-size: 12.5px; color: var(--body); margin-bottom: 14px; line-height: 1.5;
+    }
+    .app-banner .ab-stores {
+      display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+    }
+    .app-banner .ab-store {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: var(--text);
+      color: #fff;
+      text-decoration: none;
+      font-size: 12.5px; font-weight: 700;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .app-banner .ab-store:hover { opacity: 0.9; transform: translateY(-1px); }
+    .app-banner .ab-store .ab-ic {
+      width: 20px; height: 20px; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; background: rgba(255,255,255,0.2);
+    }
+    .app-banner .ab-note {
+      margin-top: 10px;
+      font-size: 11px; color: var(--caption); font-style: italic;
+    }
+
     .foot {
-      margin-top: 22px;
+      margin-top: 24px;
       font-size: 11.5px; color: var(--caption);
       text-align: center;
     }
     @media (max-width: 480px) {
       .brand .name { display: none; }
-      .logout-btn { padding: 8px 12px; }
+      .logout-btn { padding: 7px 12px; }
     }
     @media (max-width: 400px) {
       .container { padding: 14px 10px 40px; }
@@ -629,33 +663,14 @@
   const LS_MOBILE = 'drslisting_mobile';
   const LS_NAME = 'drslisting_name';
 
-  // Try query params first, then path, then hash fragment.
-  // Old QR codes may have #/web-booking?doctor=...&token=... from the
-  // removed Flutter web app — parse those as a fallback.
   const qs = new URLSearchParams(window.location.search);
-  let token = qs.get('token') || '';
-  let doctorName = qs.get('name') || '';
+  const token = qs.get('token') || '';
+  const doctorName = qs.get('name') || '';
+  // placeId comes from the /book/<placeId> path (rewrites keep the URL
+  // unchanged); a ?doctor= query param is also accepted as a fallback.
   const pathParts = window.location.pathname.split('/').filter(Boolean);
-  let placeId = qs.get('doctor') || (pathParts.length >= 2 ? pathParts[1] : '') || '';
-  // Fallback: parse #/web-booking?doctor=...&token=... hash fragment
-  // from old QR codes (removed Flutter web app hash route).
-  if (!token || !placeId) {
-    const hash = window.location.hash || '';
-    const hashMatch = hash.match(/\?([^#]*)/);
-    if (hashMatch) {
-      const hq = new URLSearchParams(hashMatch[1]);
-      if (!placeId) placeId = hq.get('doctor') || '';
-      if (!token) token = hq.get('token') || '';
-      if (!doctorName) doctorName = hq.get('name') || '';
-      // Clean URL so re-reads don't re-parse.
-      if (placeId && token) {
-        const p = new URLSearchParams();
-        p.set('doctor', placeId); p.set('token', token);
-        if (doctorName) p.set('name', doctorName);
-        window.history.replaceState({}, '', window.location.pathname + '?' + p.toString());
-      }
-    }
-  }
+  const placeId = qs.get('doctor') || (pathParts.length >= 2 ? pathParts[1] : '') || '';
+
   const DAYS_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -758,6 +773,8 @@
       const dayName = DAYS_FULL[d.getDay()];
       const hasSlots = slotsData.some(s =>
         s.day_of_week === dayName && Array.isArray(s.slots) && s.slots.length > 0);
+      // A day is selectable if it has ANY enabled slots (clinic or remote).
+      // Remote-only days will show the app-download banner.
       const unavail = isDateUnavailable(iso);
       dateOptions.push({ iso, dayName, dateNum: d.getDate(), month: MONTHS[d.getMonth()], dayShort: DAYS_SHORT[d.getDay()], hasSlots: hasSlots && !unavail, unavail });
     }
@@ -823,6 +840,8 @@
   });
 
   // ── Render slot chips for the selected date (grouped by type) ────
+  // Only clinic/offline slots are bookable from the web page.
+  // Tele & video slots show an app-download banner instead.
   function renderSlots() {
     const opt = dateOptions.find(o => o.iso === selectedDate);
     if (!opt) return;
@@ -839,14 +858,19 @@
 
     const daySlots = slotsData.filter(s => s.day_of_week === opt.dayName);
     const grouped = {};   // type -> { fee, times: [] }
+    const remoteGrouped = {}; // tele/video -> { fee, times: [] }
     for (const s of daySlots) {
       if (!s.slots || !s.slots.length) continue;
-      if (!grouped[s.schedule_type]) grouped[s.schedule_type] = { fee: s.fee, times: [] };
-      grouped[s.schedule_type].times.push(...s.slots);
+      const isRemote = s.schedule_type === 'tele' || s.schedule_type === 'video';
+      const target = isRemote ? remoteGrouped : grouped;
+      if (!target[s.schedule_type]) target[s.schedule_type] = { fee: s.fee, times: [] };
+      target[s.schedule_type].times.push(...s.slots);
     }
 
     const now = new Date();
     let html = '';
+
+    // 1. Bookable clinic/offline slots
     for (const [type, g] of Object.entries(grouped)) {
       const meta = TYPE_META[type] || { emoji: '🩺', label: 'Consultation', color: 'var(--primary)' };
       const times = [...new Set(g.times)].sort(compareTimes);
@@ -866,7 +890,35 @@
           <div class="slot-chips">${chips}</div>
         </div>`;
     }
+
+    // 2. Remote (tele/video) → show app download banner instead
+    const remoteTypes = Object.keys(remoteGrouped);
+    if (remoteTypes.length > 0) {
+      const remoteLabels = remoteTypes.map(t => {
+        const m = TYPE_META[t];
+        return m ? m.emoji + ' ' + m.label : t;
+      }).join(' & ');
+      html += `
+        <div class="app-banner">
+          <div class="ab-icon">📱</div>
+          <h3>${escapeHtml(remoteLabels)} Available</h3>
+          <p>Video & tele consultations are available through our app. Download now to book.</p>
+          <div class="ab-stores">
+            <a class="ab-store" href="https://play.google.com/store/apps/details?id=com.drslisting.ai" target="_blank" rel="noopener">
+              <span class="ab-ic">▶</span> Google Play
+            </a>
+            <a class="ab-store" href="${escapeHtml(IOS_STORE_URL)}" target="_blank" rel="noopener">
+              <span class="ab-ic">🍎</span> App Store
+            </a>
+          </div>
+          <div class="ab-note">Consultations start at ₹${Object.values(remoteGrouped)[0].fee}</div>
+        </div>`;
+    }
+
     $('slotArea').innerHTML = html || '<div class="empty-note">No slots available for this day.</div>';
+    // Disable book button if there are no bookable clinic/offline slots
+    const hasBookableSlots = Object.keys(grouped).length > 0;
+    $('bookBtn').disabled = !hasBookableSlots;
   }
 
   $('slotArea').addEventListener('click', (e) => {
@@ -980,14 +1032,10 @@
       localStorage.setItem(LS_NAME, name);
       localStorage.setItem(LS_MOBILE, mobile);
       updateSessionBar();
-      // Success card — the fee chip appears when the chosen slot
-      // carries a consultation fee (recorded as a Pending offline
-      // payment by the function; the clinic settles it on arrival).
-      const paySummary = paymentSummary(data.payment);
+      // Success card
       $('successText').innerHTML =
         '<b>' + (data.doctorName || doctorName || 'Your doctor') + '</b><br>' +
-        data.date + ' · ' + data.time + '<br><small>Ref: ' + (data.appointmentId || '') + '</small>' +
-        (paySummary ? '<br><span class="pay-chip">💵 ' + paySummary + '</span>' : '');
+        data.date + ' · ' + data.time + '<br><small>Ref: ' + (data.appointmentId || '') + '</small>';
       $('successCard').classList.remove('hidden');
       $('successCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
       // Mark the slot as taken locally + refresh history.
@@ -1038,10 +1086,6 @@
           ['📌', 'Status', a.status || 'Pending'],
         ];
         if (typeMeta) rows.push([typeMeta.emoji, 'Consultation', typeMeta.label]);
-        // Consultation fee (when the booking carried one) — amount +
-        // payment method + settlement status, e.g. "₹800 · Offline (Clinic)".
-        const paySummary = paymentSummary(a.payment);
-        if (paySummary) rows.push(['💵', 'Fee', paySummary]);
         // Clinic / hospital name (skip when it merely duplicates the name).
         const clinic = (dd.hospital_name || '').toString().trim();
         if (clinic && clinic.toLowerCase() !== (a.doctor_name || '').toLowerCase()) {
@@ -1188,22 +1232,6 @@
     if (isNaN(d)) return isoTs;
     return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() +
       ', ' + fmt(d.getHours()) + ':' + fmt(d.getMinutes());
-  }
-
-  // Payment summary for the success card + history accordion. Accepts
-  // the { amount, method, status, currency } object the function returns
-  // (from the payments row) and renders e.g. '₹800 · Offline (Clinic)' —
-  // the method label mirrors the app (Online (UPI) / Offline (Clinic))
-  // and the status is appended when it isn't the default 'Pending'.
-  // Returns '' when there is no payment (fee-less booking).
-  function paymentSummary(p) {
-    if (!p) return '';
-    const amount = Number(p.amount);
-    if (!(amount > 0)) return '';
-    const label = p.method === 'online' ? 'Online (UPI)' : 'Offline (Clinic)';
-    let s = '₹' + (Number.isInteger(amount) ? amount : amount.toFixed(2)) + ' · ' + label;
-    if (p.status && p.status !== 'Pending') s += ' · ' + p.status;
-    return s;
   }
 
   // Transient bottom toast for feedback (logout, errors).
